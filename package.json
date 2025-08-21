@@ -1,0 +1,8 @@
+{
+  "name": "smtp-contact-form",
+  "version": "1.0.0",
+  "description": "Contact form with Nodemailer on Vercel",
+  "dependencies": {
+    "nodemailer": "^6.9.1"
+  }
+}
