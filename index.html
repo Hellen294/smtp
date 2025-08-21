@@ -1,42 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Contact Us</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
-  <style>
-    body { font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f4f4; }
-    form { background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    input, textarea { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
-    button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #218838; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Form</title>
 </head>
 <body>
+  <h1>Contact Us</h1>
   <form id="contactForm">
-    <h2>Contact Us</h2>
-    <input type="text" name="name" placeholder="Your Name" required>
-    <input type="email" name="email" placeholder="Your Email" required>
-    <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+    <input type="text" name="name" placeholder="Your Name" required><br>
+    <input type="email" name="email" placeholder="Your Email" required><br>
+    <textarea name="message" placeholder="Your Message" required></textarea><br>
     <button type="submit">Send</button>
-    <p id="response"></p>
   </form>
+
+  <p id="status"></p>
+
   <script>
-    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = {
-        name: this.name.value,
-        email: this.email.value,
-        message: this.message.value
-      };
-      const response = await fetch('/api/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const result = await response.json();
-      document.getElementById('response').textContent = result.message;
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      document.getElementById('status').textContent = 'Sending...';
+
+      try {
+        const response = await fetch('/api/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        document.getElementById('status').textContent = result.message;
+      } catch (error) {
+        document.getElementById('status').textContent = 'Error sending message.';
+      }
     });
   </script>
 </body>
 </html>
-
