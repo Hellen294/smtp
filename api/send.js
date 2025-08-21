@@ -10,11 +10,8 @@ export default async function handler(req, res) {
 
   let body;
   try {
-    body = req.body;
-    if (typeof body === 'string') {
-      body = JSON.parse(body);
-    }
-  } catch (e) {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch {
     return res.status(400).json({ message: 'Invalid JSON body' });
   }
 
