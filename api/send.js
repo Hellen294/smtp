@@ -8,7 +8,17 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ message: 'Only POST requests allowed' });
 
-  const { name, email, message } = req.body;
+  let body;
+  try {
+    body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+  } catch (e) {
+    return res.status(400).json({ message: 'Invalid JSON body' });
+  }
+
+  const { name, email, message } = body;
   if (!name || !email || !message) {
     return res.status(400).json({ message: 'All fields are required.' });
   }
@@ -27,15 +37,14 @@ export default async function handler(req, res) {
     await transporter.sendMail({
       from: `"${name}" <${email}>`,
       to: process.env.SMTP_USER,
-      replyTo: email,
-      subject: `New Contact Form Message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
-      html: `<h2>New Message</h2><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p>${message}</p>`
+      subject: `New Contact Form Message`,
+      text: message,
+      html: `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p>${message}</p>`
     });
 
     return res.status(200).json({ message: '✅ Message sent successfully!' });
   } catch (error) {
-    console.error('Error sending email:', error);
-    return res.status(500).json({ message: '❌ Failed to send message.', error: error.message });
+    console.error('Email send error:', error);
+    return res.status(500).json({ message: '❌ Failed to send email', error: error.message });
   }
 }
